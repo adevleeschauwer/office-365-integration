@@ -36,7 +36,6 @@
 		<maven.clean.plugin.version>3.0.0</maven.clean.plugin.version>
 		<maven.assembly.plugin.version>3.0.0</maven.assembly.plugin.version>
 		<maven.deploy.plugin.version>2.8.2</maven.deploy.plugin.version>
-		<version.bndlib>3.2.0</version.bndlib>
 		<version.liferay.ant.bnd>2.0.28</version.liferay.ant.bnd>
 		<project.build.finalName>${project.artifactId}</project.build.finalName>
 		<project.build.extension>jar</project.build.extension>
@@ -48,9 +47,23 @@
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
-				<groupId>com.savoirfairelinux.liferay.bom</groupId>
-				<artifactId>liferay-7-ga3</artifactId>
-				 <version>1.0</version>
+				<groupId>com.liferay.portal</groupId>
+				<artifactId>release.portal.bom</artifactId>
+				<version>${liferay.target.platform}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.liferay.portal</groupId>
+				<artifactId>release.portal.bom.compile.only</artifactId>
+				<version>${liferay.target.platform}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.liferay.portal</groupId>
+				<artifactId>release.portal.bom.third.party</artifactId>
+				<version>${liferay.target.platform}</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -63,7 +76,7 @@
 
 		<dependency>
 			<groupId>biz.aQute.bnd</groupId>
-			<artifactId>biz.aQute.bnd.annotation</artifactId>
+			<artifactId>biz.aQute.bndlib</artifactId>
 			<scope>provided</scope>
 		</dependency>
 
@@ -71,7 +84,7 @@
 
 		<dependency>
 			<groupId>org.osgi</groupId>
-			<artifactId>osgi.annotation</artifactId>
+			<artifactId>org.osgi.service.component.annotations</artifactId>
 			<scope>provided</scope>
 		</dependency>
 
@@ -83,28 +96,21 @@
 
 		<dependency>
 			<groupId>org.osgi</groupId>
-			<artifactId>osgi.core</artifactId>
+			<artifactId>org.osgi.core</artifactId>
 			<scope>provided</scope>
 		</dependency>
-
-		<dependency>
-			<groupId>org.osgi</groupId>
-			<artifactId>osgi.enterprise</artifactId>
-			<scope>provided</scope>
-		</dependency>
-
-		<!-- Additional bundle-ized dependencies to be deployed globally in Liferay -->
 
 		<dependency>
 		    <groupId>org.slf4j</groupId>
 		    <artifactId>slf4j-simple</artifactId>
 		    <version>1.6.0</version>
+			<scope>provided</scope>
 		</dependency>
 
 	</dependencies>
 
 	<build>
-		<finalName>${project.build.finalName}</finalName>
+		<finalName>${project.artifactId}${bundle.suffix}</finalName>
 		<extensions>
 			<extension>
 				<groupId>org.apache.maven.wagon</groupId>
@@ -137,6 +143,7 @@
 					<artifactId>maven-jar-plugin</artifactId>
 					<version>${maven.jar.plugin.version}</version>
 					<configuration>
+						<finalName>${project.artifactId}${bundle.suffix}</finalName>
 						<archive>
 							<manifestEntries>
 								<Build-Number>${build.number}</Build-Number>
@@ -153,7 +160,7 @@
 						<dependency>
 							<groupId>biz.aQute.bnd</groupId>
 							<artifactId>biz.aQute.bndlib</artifactId>
-							<version>${version.bndlib}</version>
+							<version>3.5.0</version>
 						</dependency>
 						<dependency>
 							<groupId>com.liferay</groupId>
@@ -217,4 +224,52 @@
 		</pluginManagement>
 	</build>
 
+
+	<profiles>
+		<profile>
+			<id>liferay-70</id>
+			<activation>
+				<property>
+					<name>liferay</name>
+					<value>70</value>
+				</property>
+			</activation>
+			<properties>
+				<liferay.target.platform>7.0.6</liferay.target.platform>
+				<bundle.suffix>-lf70</bundle.suffix>
+			</properties>
+		</profile>
+		<profile>
+			<id>liferay-71</id>
+			<activation>
+				<property>
+					<name>liferay</name>
+					<value>71</value>
+				</property>
+			</activation>
+			<properties>
+				<liferay.target.platform>7.1.0</liferay.target.platform>
+				<bundle.suffix>-lf71</bundle.suffix>
+			</properties>
+		</profile>
+		<profile>
+			<id>liferay-72</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<liferay.target.platform>7.2.0</liferay.target.platform>
+				<bundle.suffix>-lf72</bundle.suffix>
+			</properties>
+			<dependencyManagement>
+				<dependencies>
+					<dependency>
+						<artifactId>portlet-api</artifactId>
+						<groupId>javax.portlet</groupId>
+						<version>2.0</version>
+					</dependency>
+				</dependencies>
+			</dependencyManagement>
+		</profile>
+	</profiles>
 </project>
